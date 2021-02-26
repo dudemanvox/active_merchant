@@ -4,7 +4,7 @@ module ActiveMerchant #:nodoc:
     end
 
     class Response
-      attr_reader :params, :message, :test, :authorization, :avs_result, :cvv_result, :error_code, :emv_authorization, :balance_amt, :authorized_amt
+      attr_reader :params, :message, :test, :authorization, :avs_result, :cvv_result, :error_code, :emv_authorization, :balance_amt, :authorized_amt, :network_transaction_id
 
       def success?
         @success
@@ -25,20 +25,18 @@ module ActiveMerchant #:nodoc:
         @fraud_review = options[:fraud_review]
         @error_code = options[:error_code]
         @emv_authorization = options[:emv_authorization]
-        @balance_amt = options[:balance_amt]
-        @authorized_amt = options[:authorized_amt]
 
         @avs_result = if options[:avs_result].kind_of?(AVSResult)
-          options[:avs_result].to_hash
-        else
-          AVSResult.new(options[:avs_result]).to_hash
-        end
+                        options[:avs_result].to_hash
+                      else
+                        AVSResult.new(options[:avs_result]).to_hash
+                      end
 
         @cvv_result = if options[:cvv_result].kind_of?(CVVResult)
-          options[:cvv_result].to_hash
-        else
-          CVVResult.new(options[:cvv_result]).to_hash
-        end
+                        options[:cvv_result].to_hash
+                      else
+                        CVVResult.new(options[:cvv_result]).to_hash
+                      end
       end
     end
 
@@ -55,14 +53,14 @@ module ActiveMerchant #:nodoc:
         @primary_response = nil
       end
 
-      def process(ignore_result=false)
+      def process(ignore_result = false)
         return unless success?
 
         response = yield
         self << response
 
         unless ignore_result
-          if(@use_first_response && response.success?)
+          if @use_first_response && response.success?
             @primary_response ||= response
           else
             @primary_response = response
@@ -72,7 +70,7 @@ module ActiveMerchant #:nodoc:
 
       def <<(response)
         if response.is_a?(MultiResponse)
-          response.responses.each{|r| @responses << r}
+          response.responses.each { |r| @responses << r }
         else
           @responses << response
         end
