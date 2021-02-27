@@ -46,7 +46,7 @@ module ActiveMerchant #:nodoc:
           message_from(response.params),
           response.params,
           test: test?,
-          authorization: authorization_from(response.params),
+          authorization: authorization_from(response.params, nil),
           balance_amt: response.balance_amt,
           authorized_amt: authorized_amount
         )
@@ -116,7 +116,7 @@ module ActiveMerchant #:nodoc:
       end
 
 
-      def commit(action, &request)
+      def commit(action, reference = nil, &request)
         data = build_request(action, &request)
 
         response = begin
@@ -130,7 +130,7 @@ module ActiveMerchant #:nodoc:
           message_from(response),
           response,
           test: test?,
-          authorization: authorization_from(response),
+          authorization: authorization_from(response, reference),
           balance_amt: response['BalanceAmt']
         )
       end
